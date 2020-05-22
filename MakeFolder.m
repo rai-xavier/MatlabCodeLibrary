@@ -1,9 +1,5 @@
-function MakeFolder(folderpath,varargin)
-if not(isempty(varargin))
-    terminal_mode = varargin{1};
-else
-    terminal_mode = false;
-end
+function MakeFolder(folderpath)
+global terminal_mode
 
 if terminal_mode
     if not(exist(folderpath, 'dir'))
