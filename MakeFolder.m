@@ -1,7 +1,6 @@
 function MakeFolder(folderpath)
-global terminal_mode
 
-if terminal_mode
+if TerminalMode
     if not(exist(folderpath, 'dir'))
         mkdir(folderpath)
     end

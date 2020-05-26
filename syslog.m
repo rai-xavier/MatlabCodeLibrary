@@ -32,7 +32,6 @@ s = " ";
 full_log_statement = strcat(timestamp, s, '(', log_type, ')', s, log_statement);
 disp(full_log_statement)
 
-global terminal_mode
-if terminal_mode & strcmp(log_type,'EXIT'); exit; end
+if TerminalMode & strcmp(log_type,'EXIT'); exit; end
 return
 end
