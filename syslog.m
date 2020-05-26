@@ -8,14 +8,18 @@ if not(isempty(varargin))
         log_type = num2str(log_type);
     else
         log_type = upper(varargin{1});
-        if contains(log_type, 'L')
+        if strcmp(log_type, 'L')
             log_type = 'LOG';
-        elseif contains(log_type,'S')
+        elseif strcmp(log_type,'P')
+            log_type = 'PATH';
+        elseif strcmp(log_type,'S')
             log_type = 'SAVE';
-        elseif contains(log_type,'W')
+        elseif strcmp(log_type,'W')
             log_type = 'WARNING';
-        elseif contains(log_type,'E')
+        elseif strcmp(log_type,'E')
             log_type = 'ERROR';
+        elseif strcmp(log_type,'X')
+            log_type = 'EXIT';
         else
             log_type = 'UNRECOGNIZED';
         end
@@ -24,8 +28,11 @@ else
     log_type = 'LOG';
 end
 
-log_statement = [timestamp ' (' log_type ') ' log_statement];
-disp(log_statement)
+s = " ";
+full_log_statement = strcat(timestamp, s, '(', log_type, ')', s, log_statement);
+disp(full_log_statement)
 
+global terminal_mode
+if terminal_mode & strcmp(log_type,'EXIT'); exit; end
 return
 end
