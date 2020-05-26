@@ -1,9 +1,8 @@
 function DockFigure(fignum)
-global terminal_mode
 
 figure(fignum);
 
-if terminal_mode
+if TerminalMode
     return; 
 end
 
