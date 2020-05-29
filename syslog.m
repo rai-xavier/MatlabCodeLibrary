@@ -1,6 +1,10 @@
 function syslog(log_statement, varargin)
 formatOut = 'mm/dd/yy HH:MM';
 timestamp = datestr(now,formatOut);
+warning('off','all')
+timestamp = datetime(timestamp,'TimeZone','EST');
+warning('on','all')
+timestamp = char(timestamp);
 
 if not(isempty(varargin))
     log_type = varargin{1};
