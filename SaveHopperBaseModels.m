@@ -10,7 +10,7 @@ if ischar(H)
         BaseModelDir = fullfile(ModelDir,'BaseModels');
     end
     MakeFolder(BaseModelDir);
-    disp(['Loading ' HopperModelPath])
+    syslog(strcat('Loading ' ,HopperModelPath))
     H = load(HopperModelPath);
     mat_vars = fields(H);
     idx_h = find(contains(mat_vars,'H'));
