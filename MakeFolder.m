@@ -2,8 +2,10 @@ function MakeFolder(folderpath)
 if isempty(folderpath);return;end
 if iscell(folderpath);folderpath=string(folderpath);end
 
-
-[folderpath,thisfn,thisext] = fileparts(folderpath);
+[~,~,thisext]=fileparts(folderpath);
+if not(isempty(thisext))
+    folderpath = fileparts(folderpath);
+end
 if TerminalMode
     if not(exist(folderpath, 'dir'))
         mkdir(folderpath)
