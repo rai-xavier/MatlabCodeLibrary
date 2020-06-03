@@ -1,6 +1,12 @@
-function SetFigureToFullScreen(fignum)
-set(figure(fignum),'WindowStyle','normal')
-set(figure(fignum), 'units','normalized')
-set(figure(fignum),'outerposition',[0 0 1 1])
+function SetFigureToFullScreen(varargin)
+if not(isempty(varargin))
+    fignum = varargin{1};
+    f=figure(fignum);
+else
+    f = figure();
+end
+set(f,'WindowStyle','normal')
+set(f, 'units','normalized')
+set(f,'outerposition',[0 0 1 1])
 return
 end
