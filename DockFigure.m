@@ -1,11 +1,13 @@
-function DockFigure(fignum)
+function DockFigure(varargin)
+if TerminalMode;    return;     end
 
-figure(fignum);
-
-if TerminalMode
-    return; 
+if not(isempty(varargin))
+    fignum = varargin{1};
+    f = figure(fignum);
+else
+    f = figure();
 end
 
-set(figure(fignum),'WindowStyle','docked'); 
+set(f,'WindowStyle','docked'); 
 return
 end
