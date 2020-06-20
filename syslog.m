@@ -24,6 +24,8 @@ if not(isempty(varargin))
             log_type = 'ERROR';
         elseif strcmp(log_type,'X')
             log_type = 'EXIT';
+        elseif strcmp(log_type,'T')
+            log_type = 'TIMER';
         else
             log_type = 'UNRECOGNIZED';
         end
