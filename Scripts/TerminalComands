@@ -1,0 +1,3 @@
+nohup matlab -r "antnum=1;WinSz=24;TrainCoM" > TrainCoM_Ant1.log & 
+
+try; ScriptName; catch ME; disp(ME);disp(struct2table(ME.stack)); exit; end
