@@ -1,3 +1,5 @@
-nohup matlab -r "antnum=1;WinSz=24;TrainCoM" > TrainCoM_Ant1.log & 
+nohup matlab -r "execute('TrainCoM','antnum',1,'WinSz',24)" > TrainCoM_Ant1.log & 
 
-try; ScriptName; catch ME; disp(ME);disp(struct2table(ME.stack)); exit; end
+git clone https://github.com/RealityAI/Hopper.git
+cd Hopper
+git checkout dev-xavier-regression
