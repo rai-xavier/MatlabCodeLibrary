@@ -8,5 +8,6 @@ end
 set(f,'WindowStyle','normal')
 set(f, 'units','normalized')
 set(f,'outerposition',[0 0 1 1])
+drawnow
 return
 end
