@@ -6,7 +6,7 @@ csvdir = fullfile(projectdir, '');
 modeldir = fullfile(projectdir,'Results');
 ModelFileName = fullfile(modeldir,'');
 ClassBalanceFigureFileName = strrep(ModelFileName,'.mat','_ClassBalance.png');
-ResubTableFileName = strrep(ModelFileName,'.mat','_ResultsTable.csv');
+ResultsTableFileName = strrep(ModelFileName,'.mat','_ResultsTable.csv');
 
 %% Train Parameters
 Fs = 20e3;
@@ -84,7 +84,7 @@ disp(['Total training time = ' num2str(toc/60) ' min'])
 disp(['Saving to ' ModelFileName])
 save(ModelFileName, 'H')
 ResultsTable = getClassifyResultsTable(H.HopperModels);
-writetable(ResultsTable,ResubTableFileName)
+writetable(ResultsTable,ResultsTableFileName)
 
 %% Train - KFold
 rng(0);
@@ -94,7 +94,7 @@ disp(['Total kfold time = ' num2str(toc/60) ' min'])
 disp(['Saving to ' ModelFileName])
 save(ModelFileName, 'H')
 ResultsTable = getClassifyResultsTable(H.HopperModels);
-writetable(ResultsTable,ResubTableFileName)
+writetable(ResultsTable,ResultsTableFileName)
 for ii=1:lenght(ModelTypes)
     for jj=1:length(FeatureSpaces)
         ConfusionMat = getHopperFeatConfMat(H.HopperModels,ModelTypes{ii},FeatureSpaces{jj},'kfold');
