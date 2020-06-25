@@ -75,6 +75,7 @@ H = HopperSVM(...
     'ModelNames', ModelTypes,...
     'UseParallel', false);
 H = H.H_FEATURE_EXTRACTORS();
+clear HData
 
 %% Train - Resub
 tic

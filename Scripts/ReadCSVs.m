@@ -1,10 +1,9 @@
 clc;clearvars;close('all')
 
 %% Paths
-projectdir = 'C:\wrk\Ripple\';
-modeldir = fullfile(projectdir,'Results-WinExplore');
+projectdir = '';
 
-csvdir = fullfile(projectdir, '01-Cmpr_Rslts_Test_20200615\Pre-Segmented\');
+csvdir = fullfile(projectdir, '');
 mydir=dir(csvdir);
 
 %% Loop CSVs
