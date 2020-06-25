@@ -3,7 +3,7 @@ if isempty(folderpath);return;end
 if iscell(folderpath);folderpath=string(folderpath);end
 
 [~,~,thisext]=fileparts(folderpath);
-if not(isempty(thisext))
+if not(isempty(thisext)) && not(strcmp(thisext,""))
     folderpath = fileparts(folderpath);
 end
 if TerminalMode
