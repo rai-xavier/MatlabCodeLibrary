@@ -1,6 +1,6 @@
 
 function ResultsTable = getClassifyResultsTable(HopperTable)
-ResultsTable = struct;
+ResultsTable = struct;rowidx=1;
 AllFeats = HopperTable.Properties.RowNames;
 AllTypes = HopperTable.Properties.VariableNames;
 for jj=1:length(AllTypes)
@@ -10,11 +10,12 @@ for jj=1:length(AllTypes)
                 case 1; train = 'Resub';
                 case 2; train = 'KFold';
             end
-            metrics = H.HopperModels.(AllTypes{jj})(kk).([train 'Metrics']);
+            metrics = HopperTable.(AllTypes{jj})(kk).([train 'Metrics']);
             if isempty(metrics); continue ;end
-            ResultsTable.Training(end+1,1) = train;
-            ResultsTable.Feat(end,1) = AllFeats(kk);
-            ResultsTable.(AllTypes{jj})(end,1) = metrics(4);
+            ResultsTable.Training(rowidx,1) = {train};
+            ResultsTable.Feat(rowidx,1) = AllFeats(kk);
+            ResultsTable.(AllTypes{jj})(rowidx,1) = metrics(4);
+            rowidx=rowidx+1;
         end
     end
 end
