@@ -1,4 +1,4 @@
-function SetFigureToFullScreen(varargin)
+function fullscreen(varargin)
 if not(isempty(varargin))
     fignum = varargin{1};
     f=figure(fignum);
