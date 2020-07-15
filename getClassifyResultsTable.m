@@ -13,13 +13,15 @@ for jj=1:length(AllTypes)
             metrics = HopperTable.(AllTypes{jj})(kk).([train 'Metrics']);
             if isempty(metrics); continue ;end
             ResultsTable.Training(rowidx,1) = {train};
+            ResultsTable.ModelType(rowidx,1) = AllTypes(jj);
             ResultsTable.Feat(rowidx,1) = AllFeats(kk);
-            ResultsTable.(AllTypes{jj})(rowidx,1) = metrics(4);
+            ResultsTable.WinSz(rowidx,1) = HopperTable.(AllTypes{jj})(kk).ModelInfo.WindowSize;
+            ResultsTable.Accuracy(rowidx,1) = {metrics(4)};
             rowidx=rowidx+1;
         end
     end
 end
 ResultsTable = struct2table(ResultsTable);
-ResultsTable = sortrows(ResultsTable,AllTypes{1},'descend');
+ResultsTable = sortrows(ResultsTable,'Accuracy','descend');
 return
 end
