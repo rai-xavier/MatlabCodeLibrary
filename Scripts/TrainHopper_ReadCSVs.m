@@ -12,7 +12,7 @@ ResultsTableFileName = strrep(ModelFileName,'.mat','_ResultsTable.csv');
 Fs = 20e3;
 winsz = 0.5*Fs;
 stepsz = 0.5*winsz;
-A = split('A1 A2 A3 A5 A5 A6',' ');
+A = split('A1 A2 A3 A4 A5 A5 A6',' ');
 BA = cellfun(@(x) ['B' x], A,'UniformOutput',false);
 C = split('C1 C2 C3 C4 C5 C6 C7',' ');
 BC = cellfun(@(x) ['B' x], C,'UniformOutput',false);
@@ -20,7 +20,7 @@ E1 = cellfun(@(x) ['E1' x], C,'UniformOutput',false);
 E2 = cellfun(@(x) ['E2' x], C,'UniformOutput',false);
 FeatureSpaces = [A;BA;C;BC]';
 ModelTypes = {'STA_LIN_OVO','STA_LIN_OVA','NST_POLY_OVO'};
-
+UseParallel = true; % only helpful for # Classes > 2
 %% Loop CSVs
 HData = {};
 HLabels = [];
@@ -73,9 +73,9 @@ H = HopperSVM(...
     'GroupMap',GroupMap,...
     'FeatureNames',FeatureSpaces, ...
     'ModelNames', ModelTypes,...
-    'UseParallel', false);
-H = H.H_FEATURE_EXTRACTORS();
-clear HData
+    'UseParallel', UseParallel);
+H = H.H_FEATURE_EXTRACTORS(); 
+clear HData % sometimes necessary to clear up memory b/c data is stored twice in HopperSVM (once as HData and again as FeatureData)
 
 %% Train - Resub
 tic
@@ -83,17 +83,21 @@ H = H.H_TRAIN_MODELS(1);
 H = H.H_RESUB();
 disp(['Total training time = ' num2str(toc/60) ' min'])
 disp(['Saving to ' ModelFileName])
-save(ModelFileName, 'H')
+save(ModelFileName, 'H','-v7.3') % -v7.3 flag important if >= 2GB
 ResultsTable = getClassifyResultsTable(H.HopperModels);
 writetable(ResultsTable,ResultsTableFileName)
 
 %% Train - KFold
 rng(0);
 tic
-H = H.H_KFOLD([], 10, [], true); toc
+NumFolds = 10;
+UseGroups = true;
+H = H.H_KFOLD([], NumFolds, [], UseGroups); toc
 disp(['Total kfold time = ' num2str(toc/60) ' min'])
 disp(['Saving to ' ModelFileName])
 save(ModelFileName, 'H')
+
+%% Retrieve/Save Results
 ResultsTable = getClassifyResultsTable(H.HopperModels);
 writetable(ResultsTable,ResultsTableFileName)
 for ii=1:lenght(ModelTypes)
