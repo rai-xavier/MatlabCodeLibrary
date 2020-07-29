@@ -6,7 +6,18 @@ if TerminalMode
     addpath(fullfile(projectdir,'Hopper'))
     
     % Req'd Vars
-    if not(exist('windex'));syslog('Require var windex','x');end
+%     if not(exist('windex'));syslog('Require var windex','x');end
+    ReqVars = {'FailType','SensorGroup','SensorIdx','WinSz','StepSz','FeatureSpace','ModelType'};
+    for r=1:length(ReqVars)
+        command = {};
+        command{end+1} = "if not(exist('";
+        command{end+1} = ReqVars{r};
+        command{end+1} = "','var')); syslog('DEFINE VAR: ";
+        command{end+1} = ReqVars{r};
+        command{end+1} = "','x'); end";
+        command = join(cellfun(@char,command,'UniformOutput',false), '');
+        evalc(char(command))
+    end
     
 else
     clearvars;close('all')
@@ -32,6 +43,12 @@ syslog(strcat('SubsetProportion = ',num2str(SubsetProportion)))
 UseParallel = false;
 syslog(strcat('UseParallel = ',num2str(UseParallel)))
 
+% KFold
+UseGroups = true;
+NumGroups = 10;
+syslog(strcat('UseGroups = ',num2str(UseGroups)))
+syslog(strcat('NumGroups = ',num2str(NumGroups)))
+
 % segmentation
 Fs = 20e3;
 winsz_low = 50;
@@ -43,7 +60,7 @@ syslog(strcat('window_sizes = ',num2str(window_sizes)))
 
 % feature spaces
 Options = struct('samplerate',Fs,'nfilts',26);
-A = split('A1 A2 A3 A5 A5 A6',' ');
+A = split('A1 A2 A3 A4 A5 A6',' ');
 BA = cellfun(@(x) ['B' x], A,'UniformOutput',false);
 C = split('C1 C2 C3 C4 C5 C6 C7',' ');
 BC = cellfun(@(x) ['B' x], C,'UniformOutput',false);
@@ -62,15 +79,30 @@ for winsz = window_sizes
     syslog(strcat('winsz = ',num2str(winsz)))
     stepsz = 0.5*winsz;
     
-    ModelFileName = fullfile(modeldir,['H_' num2str(winsz) 'win']);
+    %% output directories
+    modeldir = fullfile(resultsdir,['Models-' num2str(winsz)]);
+    basemodeldir = fullfile(resultsdir, ['BaseModels-'  num2str(winsz)]);
+    classbalancedir = fullfile(resultsdir, ['ClassBalance-'  num2str(winsz)]);
+    resultstabledir = fullfile(resultsdir, ['ResultsTable-'  num2str(winsz)]);
+    kfoldcmdir = fullfile(resultsdir, ['KFoldCM-'  num2str(winsz)]);
+    
+    dirs = {'resultsdir','modeldir','basemodeldir','classbalancedir','resultstabledir','kfoldcmdir'};
+    for d=1:length(dirs)
+        evalc(['MakeFolder(' dirs{d} ')']);
+    end
+        
+        
+    %% file paths
+    
+    ModelFileName = ['H_' num2str(winsz) 'win'];
+    ModelFilePath = fullfile(modeldir,ModelFileName);
+    if exist(ModelFilePath,'file');continue; end
     syslog(strcat('ModelFileName = ',num2str(ModelFileName)))
     
-    ClassBalanceFigureFileName = strrep(ModelFileName,'.mat','_ClassBalance.png');
-    syslog(strcat('ClassBalanceFigureFileName = ',num2str(ClassBalanceFigureFileName)))
-    
-    ResultsTableFileName = strrep(ModelFileName,'.mat','_ResultsTable.csv');
-    syslog(strcat('ResubTableFileName = ',num2str(ResubTableFileName)))
-    
+    ClassBalanceFigureFilePath = fullfile(classbalancedir, strrep(ModelFileName,'.mat','_ClassBalance.png') );
+    ResultsTableFilePath = fullfile(resultstabledir, strrep(ModelFileName,'.mat','_ResultsTable.csv') );
+    KFoldCMFilePath = fullfile(kfoldcmdir, strrep(ModelFileName,'.mat','_KFoldCM.png') );
+        
     %% Loop CSVs
     HData = {};
     HLabels = [];
@@ -89,6 +121,8 @@ for winsz = window_sizes
         
     end
     disp(newline)
+    
+    %% format data
     HData = {cell2mat(HData)};
     HLabels = cell2mat(HLabels);
     HGroups = cell2mat(HGroups);
@@ -99,7 +133,7 @@ for winsz = window_sizes
     
     %% Plot ClassBalance
     
-    SetFigureToFullScreen(1);clf
+    fullscreen(1);clf
     histogram(HLabels);
     xticks(unique(HLabels))
     xticklabels(ClassMap);
@@ -111,9 +145,9 @@ for winsz = window_sizes
     mytitle{3} = [num2str(winsz) 'win'];
     mytitle = strrep(mytitle,'_','-');
     title(mytitle);
-    SetFigureToFullScreen(1);
+    fullscreen(1);
     saveas(figure(1),ClassBalanceFigureFileName);
-    DockFigure(1)
+    dock(1)
     
     %% Subset Data
     
@@ -151,28 +185,42 @@ for winsz = window_sizes
     H = H.H_TRAIN_MODELS(1);
     H = H.H_RESUB();
     syslog(['Total training time = ' num2str(toc/60) ' min'])
-    syslog(['Saving to ' ModelFileName])
-    save(ModelFileName, 'H')
-    ResultsTable = getClassifyResultsTable(H.HopperModels);
-    writetable(ResultsTable,ResultsTableFileName)
     
     %% Train - KFold
     rng(0);
     tic
-    H = H.H_KFOLD([], 10, [], true); toc
+    H = H.H_KFOLD([], NumGroups, [], UseGroups); toc
     syslog(['Total kfold time = ' num2str(toc/60) ' min'])
+
+    %% add metdata to results table
+    
+    
+    
+    %% save Model + Table
     syslog(['Saving to ' ModelFileName])
-    save(ModelFileName, 'H')
+    save(ModelFilePath, 'H','-v7.3')
+    
+    syslog(['Saving to ' ResultsTableFilePath])
     ResultsTable = getClassifyResultsTable(H.HopperModels);
-    writetable(ResultsTable,ResultsTableFileName)
+    writetable(ResultsTable,ResultsTableFilePath)
+    
+    
+    
+    %% save BaseModels + ConfMat
     for ii=1:lenght(ModelTypes)
         for jj=1:length(FeatureSpaces)
+            
+            BaseModelFilePath = [];
+            H_BaseModel = H.HopperModels.STA_LIN_OVO.BaseModel;
+            save(BaseModelFilePath, 'H_BaseModel','-v7.3')
+            
             ConfusionMat = getHopperFeatConfMat(H.HopperModels,ModelTypes{ii},FeatureSpaces{jj},'kfold');
             saveConfMatFig(ConfusionMat, ModelFilePath, labelmap, FeatureSpaces{jj}, 'kfold');
             [Recall,Precision,F1] = getMarginals(ConfusionMat);
         end
     end
     
+
     %% end loop windows
 end
 
