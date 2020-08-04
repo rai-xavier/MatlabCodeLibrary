@@ -1,4 +1,5 @@
 function showstack(ME)
-struct2table(ME.stack)
+disp(ME)
+disp(struct2table(ME.stack))
 return
 end
