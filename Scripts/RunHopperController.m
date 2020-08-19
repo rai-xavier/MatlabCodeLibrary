@@ -3,9 +3,15 @@ pathToPoolProfile = '\\abyss1\active_projects\Hopper_Dev\dev-xavier\Hopper\Cloud
 clc
 %% jsonDir
 % jsonDir = 'C:\wrk\dev-xavier\debug\7-17 SensorSpec\New error\';
-jsonDir = 'C:\wrk\dev-xavier\debug\7-17 SensorSpec\duplicate-results\';
-% jsonDir = 'C:\wrk\dev-xavier\debug\7-17 SensorSpec\Rheem Test Data 1 OD_OK 1sec Subset 1000';
-ResampleRates = [333,167,83,42];
+% jsonDir = 'C:\wrk\dev-xavier\debug\7-17 SensorSpec\duplicate-results\';
+% jsonDir = 'C:\wrk\dev-xavier\debug\7-17 SensorSpec\Rheem Test Data 1 OD_OK 1sec Subset 1000'; ModelName = 'aNewFile_200804124555_STA_LIN_OVO_A1.mat';
+% jsonDir = 'C:\wrk\dev-xavier\debug\7-17 SensorSpec\duplicate-results-2'; 
+
+jsonDir = 'C:\wrk\dev-xavier\debug\8-5 SensorSpec UpwardCurve\5f2a971110c2b25cae5f06aa';
+% jsonDir = 'C:\wrk\dev-xavier\debug\8-5 SensorSpec UpwardCurve\5f2b2a3d2377af42cc83475c';
+NativeRate = 16e3;
+ResampleRates = [500,1000,2000,4000];
+% ResampleRates = [250, 1625, 3000];
 %% re-format json-init file
 
 % file paths
@@ -29,23 +35,26 @@ jsonInitDataOrig = swapDirs(jsonInitDataOrig,jsonDir);
 jsonInitDataArray = [];
 for ii=1:length(ResampleRates)
     jsonInitDataNew = jsonInitDataOrig;
-    jsonInitDataNew.SampleRate = num2str(ResampleRates(1));
+    jsonInitDataNew.dumpFlag = true;
+%     jsonInitDataNew.H_SAVE = true;
+%     jsonInitDataNew.forPrediction = fullfile(jsonDir,ModelName);
+    
+    jsonInitDataNew.SampleRate = num2str(NativeRate);
     jsonInitDataNew.ResampleRate = num2str(ResampleRates(ii));
     
-    jsonInitDataNew.NoiseType = "SNR";
+%     jsonInitDataNew.NoiseType = "SNR";
 %     jsonInitDataNew.NoiseValue = num2str(0.0001);
-    jsonInitDataNew.NoiseValue = num2str(10000);
+%     jsonInitDataNew.NoiseValue = num2str(10000);
     
-    jsonInitDataNew.featureNames = 'A1';
-    jsonInitDataNew.modelNames = 'STA_LIN_OVO';
+%     jsonInitDataNew.featureNames = 'A1';
+%     jsonInitDataNew.modelNames = 'STA_LIN_OVO';
     
 %     jsonInitDataNew.methodToUse = "H_RESUB";
 %     jsonInitDataNew.methodParameters = [1];
     
-    jsonInitDataNew.methodToUse = "H_KFOLD";
-    jsonInitDataNew.methodParameters = [2,10,0,0];
+%     jsonInitDataNew.methodToUse = "H_KFOLD";
+%     jsonInitDataNew.methodParameters = [2,10,0,0];
 
-    
     jsonInitDataArray = [jsonInitDataArray; jsonInitDataNew];
 end
 
@@ -62,9 +71,19 @@ jsonCommand.MethodToUse = 'JSONINIT';
 jsonCommand.MethodParameters = jsonInitFilePathDst;
 jsonCommand = jsonencode(jsonCommand);
 
-%% Run Hopperconotroller
+%% Run HopperController
+diaryfile = strrep(jsonInitFilePathDst,'.json',['-' num2str(ResampleRates) '.log']);
+if exist(diaryfile, 'file')==2
+  delete(diaryfile);
+end
+diary(diaryfile)
+diary on
 HopperController(ProcessIdentifier, pathToPoolProfile, jsonCommand)
+diary off
 
+%% Inspect log/diary
+hopperLogArray = ReadHopperLog(diaryfile);
+openvar('hopperLogArray')
 %%
 function jsonCommand = swapDirs(jsonCommand,newdir)
 myfields = {'pathToIndexCSV','pathToData','forPrediction','baseToolPath'};
