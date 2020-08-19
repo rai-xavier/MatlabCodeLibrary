@@ -104,7 +104,9 @@ for winsz = window_sizes
         
     %% Loop CSVs
     HData = {};
-    HLabels = [];
+    HLabels = {};
+    HGroups = {};
+    HGroupsExt = {};
     disp(newline)
     for ii=1:length(mydir)
         [~,fn,ext]=fileparts(mydir(ii).name);
@@ -116,8 +118,9 @@ for winsz = window_sizes
         HData{end,2} = window_data(T.Amp, winsz,stepsz);
         HLabels{end+1,1} = window_data(T.HallStepSmooth, winsz,stepsz);
         HLabels{end} = mean(HLabels{end},2);
-        HGroups{end+1,1} = repmat(fn,length(HLabels{end}),1);
-        
+        HGroups{end+1,1} = repmat(string(fn),length(HLabels{end}),1);
+        HGroupsExt{end+1,1} = join([HLabels(end) HGroups(end)],'-');
+
     end
     disp(newline)
     
@@ -132,21 +135,19 @@ for winsz = window_sizes
     
     %% Plot ClassBalance
     
-    fullscreen(1);clf
+    dock(1);clf
     histogram(HLabels);
     xticks(unique(HLabels))
     xticklabels(ClassMap);
     xtickangle(45)
     ylabel('# Samples')
     mytitle={};
-    [~,mytitle{1},~] = fileparts(ClassBalanceFigureFileName);
+    [~,mytitle{1},~] = fileparts(ClassBalanceFigureFilePath);
     mytitle{2} = ['# Total Samples = ' num2str(length(HLabels))];
     mytitle{3} = [num2str(winsz) 'win'];
     mytitle = strrep(mytitle,'_','-');
     title(mytitle);
-    fullscreen(1);
-    saveas(figure(1),ClassBalanceFigureFileName);
-    dock(1)
+    saveas(gcf,ClassBalanceFigureFilePath);
     
     %% Subset Data
     
@@ -197,7 +198,10 @@ for winsz = window_sizes
     
     %% Add MetaData & Save ResultsTable
     syslog(['Saving to ' ResultsTableFilePath])
+    syslog(['Total kfold time = ' num2str(toc/60) ' min'])    
     ResultsTable = getClassifyResultsTable(H.HopperModels);
+    % add metdata to results table
+    syslog(['Saving to ' ResultsTableFilePath])
     writetable(ResultsTable,ResultsTableFilePath)
     
     %% Save BaseModel + ResubCM
