@@ -91,7 +91,6 @@ for winsz = window_sizes
         evalc(['MakeFolder(' dirs{d} ')']);
     end
         
-        
     %% file paths
     
     ModelFileName = ['H_' num2str(winsz) 'win'];
@@ -190,35 +189,42 @@ for winsz = window_sizes
     rng(0);
     tic
     H = H.H_KFOLD([], NumGroups, [], UseGroups); toc
-    syslog(['Total kfold time = ' num2str(toc/60) ' min'])
-
-    %% add metdata to results table
+    syslog(['Total kfold time = ' num2str(toc/60) ' min'])   
     
-    
-    
-    %% save Model + Table
+    %% save Model 
     syslog(['Saving to ' ModelFileName])
     save(ModelFilePath, 'H','-v7.3')
     
+    %% Add MetaData & Save ResultsTable
     syslog(['Saving to ' ResultsTableFilePath])
     ResultsTable = getClassifyResultsTable(H.HopperModels);
     writetable(ResultsTable,ResultsTableFilePath)
     
-    
-    
-    %% save BaseModels + ConfMat
-    for ii=1:lenght(ModelTypes)
-        for jj=1:length(FeatureSpaces)
+    %% Save BaseModel + ResubCM
+    Models = H.HopperModels.Properties.VariableNames;
+    Models = reshape(Models,1,length(Models));
+    Feats = H.HopperModels.Properties.RowNames;
+    Feats = reshape(Feats,1,length(Feats));
+    for M = Models
+        M = char(M);
+        for f = 1:length(Feats)
+            F = Feats{f};
             
-            BaseModelFilePath = [];
-            H_BaseModel = H.HopperModels.STA_LIN_OVO.BaseModel;
-            save(BaseModelFilePath, 'H_BaseModel','-v7.3')
+            BaseModelName = strrep(ModelName,'.mat',['-' M '-' F '.mat']);
             
-            ConfusionMat = getHopperFeatConfMat(H.HopperModels,ModelTypes{ii},FeatureSpaces{jj},'kfold');
-            saveConfMatFig(ConfusionMat, ModelFilePath, labelmap, FeatureSpaces{jj}, 'kfold');
-            [Recall,Precision,F1] = getMarginals(ConfusionMat);
+            BaseModelPath = fullfile(basemodeldir,BaseModelName);
+            HBaseModel = H.HopperModels.(M).BaseModel;
+            save(BaseModelPath, 'HBaseModel','-v7.3')
+
+            ConfMatPath = fullfile(confmatdir,strrep(BaseModelName,'.mat','-ResubCM.png'));
+            dock
+            plotConfMat(H.HopperModels.(M)(f).ResubConfusionMat,unique(HLabels))
+            sgtitle(strrep(BaseModelName,'_','-'))
+            saveas(gcf,ConfMatPath);
+            
         end
     end
+
     
 
     %% end loop windows
