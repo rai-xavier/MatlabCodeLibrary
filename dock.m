@@ -31,7 +31,7 @@ try
     drawnow
 
 catch ME
-    
+    showstack(ME)
 end
 return
 end
