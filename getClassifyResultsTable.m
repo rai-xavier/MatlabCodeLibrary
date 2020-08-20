@@ -16,7 +16,7 @@ for jj=1:length(AllTypes)
             ResultsTable.ModelType(rowidx,1) = AllTypes(jj);
             ResultsTable.Feat(rowidx,1) = AllFeats(kk);
             ResultsTable.WinSz(rowidx,1) = HopperTable.(AllTypes{jj})(kk).ModelInfo.WindowSize;
-            ResultsTable.Accuracy(rowidx,1) = {metrics(4)};
+            ResultsTable.Accuracy(rowidx,1) = {metrics(1)};
             rowidx=rowidx+1;
         end
     end
