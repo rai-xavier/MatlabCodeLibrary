@@ -1,4 +1,4 @@
-function dock(varargin)
+function varargout = dock(varargin)
 if TerminalMode;    return;     end
 
 try
@@ -29,7 +29,7 @@ try
     
     set(f,'WindowStyle','docked');
     drawnow
-
+    if logical(nargout); varargout{1} = f; end
 catch ME
     showstack(ME)
 end
