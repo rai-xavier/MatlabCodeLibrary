@@ -10,7 +10,6 @@ clc
 
 jsonDir = 'C:\wrk\dev-xavier\debug\8-11 SensorSpec stderr bug';
 src = 'jsonString.json'; 
-
 %% re-format json-init file
 
 % file paths

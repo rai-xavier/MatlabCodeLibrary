@@ -1,20 +1,19 @@
-function MakeFolder(folderpath)
-if isempty(folderpath);return;end
-if iscell(folderpath);folderpath=string(folderpath);end
+function MakeFolder(varargin)
+% if isempty(folderpath);return;end
 
-[~,~,thisext]=fileparts(folderpath);
-if not(isempty(thisext)) && not(strcmp(thisext,""))
-    folderpath = fileparts(folderpath);
-end
-if TerminalMode
+
+for i = 1:length(varargin)
+    folderpath = varargin{i};
+    [~,~,thisext]=fileparts(folderpath);
+    if not(isempty(thisext)) && not(strcmp(thisext,""))
+        folderpath = fileparts(folderpath);
+    end
     if not(exist(folderpath, 'dir'))
         mkdir(folderpath)
     end
-else
-    if not(isfolder(folderpath))
-       mkdir(folderpath)
-    end
+    
 end
+
 
 return
 end

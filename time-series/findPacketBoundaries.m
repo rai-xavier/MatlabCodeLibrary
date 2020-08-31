@@ -11,7 +11,7 @@ if isempty(eventIdxs)
     return
 end
 
-eventIdxsDiff = diff(eventIdxs) ;
+eventIdxsDiff = diff(eventIdxs);
 
 stopPts = find(eventIdxsDiff > 1);
 packetStopIdxs = [stopPts; length(eventIdxs)];
@@ -20,6 +20,7 @@ startPts = find(eventIdxsDiff > 1) + 1;
 packetStartIdxs = [1; startPts];
 
 packetBoundaries = [eventIdxs(packetStartIdxs), eventIdxs(packetStopIdxs)];
+
 
 end
 
