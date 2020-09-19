@@ -1,4 +1,4 @@
-function TitleAbove(mytitle)
+function titleabove(mytitle)
 % if using MAtlab < 2018a, sgtitle not available
 % mtit found on file exchange
 % fallback case = normal title function
