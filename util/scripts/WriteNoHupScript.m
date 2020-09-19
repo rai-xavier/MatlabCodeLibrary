@@ -135,7 +135,7 @@ end
 
 %% runTrainPairwisePartitions.sh
 if false
-    projectdir = 'C:\wrk\Rheem\Phase 1 Analysis';
+    projectdir = 'Z:\Rheem\IndoorPrognostics\Phase 1 Analysis';
     MatlabScriptName = 'TrainPairwisePartitions';
     NoHupScriptPath = fullfile(projectdir,['run' MatlabScriptName '.sh']);
     if exist(NoHupScriptPath); delete(NoHupScriptPath); end
@@ -146,39 +146,94 @@ if false
     fwrite(fid,newline,'char');
     
     % SensorIdxs = {'M1','M4','A1','A4'}; % compr shell + fan motor
-    SensorIdxs = {'M1','M4'};
+    SensorIdxs = {'M1'};
     
     % FailTypes = {'OD','ID','CHRG','MULTI'};
-    FailTypes = {'ID','CHRG'};
-    
-    PartitionNum=6;
+%     FailTypes = {'OD','ID','CHRG'};
+    FailTypes = {'ID','OD','CHRG'};
+    PartitionNums=[8];
     % WIndex = 1:5;
     WIndex = 5;
-    
+    FIndex = 1:3;
     NumCombos = 220;
     NumComboPartitions = 5;
     ComboPartitions = linspace(1,NumCombos,NumComboPartitions+1);
     
-    for s=1:length(SensorIdxs)
-        for f =1:length(FailTypes)
-            for w=1:length(WIndex)
-                for c=1:NumComboPartitions
-                    command = createNoHupCommand(MatlabScriptName,...
-                        [SensorIdxs{s} '-P' num2str(PartitionNum) '-' FailTypes{f} '-W' num2str(WIndex(w)) '-C' num2str(c) ],...
-                        'PartitionNums',PartitionNum,...
-                        'SensorIdxs',SensorIdxs{s},...
-                        'FailTypes',FailTypes{f},...
-                        'WIndex',WIndex(w),...
-                        'CIndex',round(ComboPartitions(c):ComboPartitions(c+1))...
-                        );
-                    fwrite(fid, command,'char');
-                    fwrite(fid,newline,'char');
+    for p = 1:length(PartitionNums)
+        for s=1:length(SensorIdxs)
+            for f =1:length(FailTypes)
+                for w=1:length(WIndex)
+                    for ff = 1:length(FIndex)
+                        %                 for c=1:NumComboPartitions
+                        command = createNoHupCommand(MatlabScriptName,...
+                            [SensorIdxs{s} '-P' num2str(PartitionNums(p)) '-' FailTypes{f} '-W' num2str(WIndex(w)) '-F' num2str(ff) ],...
+                            'PartitionNums',PartitionNums(p),...
+                            'SensorIdxs',SensorIdxs{s},...
+                            'FailTypes',FailTypes{f},...
+                            'WIndex',WIndex(w),...
+                            'FIndex',FIndex(ff)...
+                            );
+                        %                         'CIndex',round(ComboPartitions(c):ComboPartitions(c+1))...
+                        fwrite(fid, command,'char');
+                        fwrite(fid,newline,'char');
+                    end
                 end
             end
         end
     end
     fclose(fid);
     open(NoHupScriptPath)
+end
+
+%% runTestPairwisePartitions.sh
+if true
+    projectdir = 'Z:\Rheem\IndoorPrognostics\Phase 1 Analysis';
+    MatlabScriptName = 'TestPairwisePartitions';
+    NoHupScriptPath = fullfile(projectdir,['run' MatlabScriptName '.sh']);
+    if exist(NoHupScriptPath); delete(NoHupScriptPath); end
+    disp(['Writing ' NoHupScriptPath ])
+    [fid,errmsg] = fopen(NoHupScriptPath,'wt');
+    
+    fwrite(fid, '#!/bin/bash','char');
+    fwrite(fid,newline,'char');
+    
+    % SensorIdxs = {'M1','M4','A1','A4'}; % compr shell + fan motor
+    % FailTypes = {'OD','ID','CHRG','MULTI'};
+    
+    SensorIdxs = {'M1'};
+    PartitionNums=[8];
+    FailTypes = {'ID'};
+    WIndex = 5;
+    FIndex = 1:3;
+    NumCombos = 220;
+    NumComboPartitions = 5;
+    ComboPartitions = linspace(1,NumCombos,NumComboPartitions+1);
+    
+    for p = 1:length(PartitionNums)
+        for s=1:length(SensorIdxs)
+            for f =1:length(FailTypes)
+                for w=1:length(WIndex)
+                    for ff = 1:length(FIndex)
+                        %                 for c=1:NumComboPartitions
+                        command = createNoHupCommand(MatlabScriptName,...
+                            [SensorIdxs{s} '-P' num2str(PartitionNums(p)) '-' FailTypes{f} '-W' num2str(WIndex(w)) '-F' num2str(ff) ],...
+                            'PartitionNums',PartitionNums(p) ,...
+                            'SensorIdxs',SensorIdxs{s} ,...
+                            'FailTypes',FailTypes{f} ,...
+                            'WIndex',WIndex(w) ,...
+                            'FIndex',FIndex(ff) ...
+                            );
+                        %                         'CIndex',round(ComboPartitions(c):ComboPartitions(c+1))...
+                        fwrite(fid, command,'char');
+                        fwrite(fid,newline,'char');
+                    end
+                end
+            end
+        end
+    end
+    fclose(fid);
+    open(NoHupScriptPath)
+%     system(['not epad++.exe ' NoHupScriptPath])
 end
 
 %% runWindowLoopClass.sh
@@ -211,8 +266,8 @@ if false
     open(NoHupScriptPath)
 end
 
-%% runWindowLoopClass.sh
-if true
+%% runHallCounterTestOnVoltSpikes.sh
+if false
     projectdir = 'C:\wrk\Ripple\Deliverables\HallCounter';
     MatlabScriptName = 'HallCounterTestOnVoltSpikes';
     NoHupScriptPath = fullfile(projectdir,['run' MatlabScriptName '.sh']);
@@ -240,6 +295,7 @@ if true
     fclose(fid);
     open(NoHupScriptPath)
 end
+
 %% createNoHupCommand
 
 function command = createNoHupCommand(ScriptName,LogSuffix,varargin)
