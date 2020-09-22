@@ -1,5 +1,5 @@
 function varargout = dock(varargin)
-if TerminalMode;    return;     end
+if TerminalMode;    varargout{1} = [];;return;     end
 
 try
     if nargin>=1
@@ -33,7 +33,9 @@ try
         varargout{1} = f;
 %         else; varargout{end
 catch ME
+	varargout{1} = [];
     showstack(ME)
+
 end
 return
 end
