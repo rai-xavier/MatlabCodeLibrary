@@ -1,5 +1,4 @@
 function varargout = dock(varargin)
-if TerminalMode;    varargout{1} = [];;return;     end
 
 try
     if nargin>=1
@@ -26,8 +25,8 @@ try
        f = figure();        
     end
         
-    
-    set(f,'WindowStyle','docked');
+    if not(TerminalMode); set(f,'WindowStyle','docked'); return; end
+
     drawnow
 %     if logical(nargout); 
         varargout{1} = f;
