@@ -1,22 +1,23 @@
-restoredefaultpath
+% restoredefaultpath
+newpaths = {};
+newpaths{end+1,1} = '/home/xgutierrez/Hopper';
+newpaths{end+1,1} = '/home/xgutierrez/HopperUtilities';
 
-hopperpath = '/home/xgutierrez/Hopper';
-addpath(hopperpath)
-
-hopperutilpath = '/home/xgutierrez/HopperUtilities';
-addpath(hopperutilpath)
-
-matlablibpath = '/home/xgutierrez/MatlabCodeLibrary';
-% matlablibpath = '\\abyss1\Active_Projects\MATLAB-CodeLibraries\MatLabCodeLibraryRepo';
-matlablibpath = split(genpath(matlablibpath),';');
+matlablibpath = genpath('/home/xgutierrez/MatlabCodeLibrary');
+matlablibpath = split(matlablibpath,pathsep);
+% remove git
 idx_git = contains(matlablibpath,'git');
 matlablibpath(idx_git) = [];
-matlablibpath = char(join(matlablibpath,';'));
-addpath(matlablibpath)
+% remove empty
+idx_empty = strcmp(matlablibpath,'');
+matlablibpath(idx_empty) = [];
+newpaths = [newpaths;matlablibpath];
+for n = 1 : length(matlablibpath); 
+	disp(['Adding to MatLab path: ' newpaths{n}])
+	addpath(newpaths{n},'-begin'); 
+end
 
-
-
-savepath
+savepath /usr/local/MATLAB/R2017a/toolbox/local/pathdef.m
 
 
 % pathToPoolProfile = '/home/matlab/Hopper/HopperController_v1_522_Compiled_08_20_20/Cloud_Cluster_Profile.settings';
