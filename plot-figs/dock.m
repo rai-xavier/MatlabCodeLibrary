@@ -29,7 +29,9 @@ try
     
     set(f,'WindowStyle','docked');
     drawnow
-    if logical(nargout); varargout{1} = f; end
+%     if logical(nargout); 
+        varargout{1} = f;
+%         else; varargout{end
 catch ME
     showstack(ME)
 end
