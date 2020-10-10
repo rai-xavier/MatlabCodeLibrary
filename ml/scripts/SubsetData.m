@@ -1,3 +1,30 @@
+%% RMS
+dock('ClassRMS'); clf
+NumBins = 20;
+MinRMSBin = 2;
+SubsetIdx = [];
+for n = 1 : length(ClassMap)
+    % subset class
+    classidx = find(HLabels == n);
+    % calculate rms
+    ClassRMS = cellfun(@(x) rms(x(classidx,:),2), HData, 'UniformOutput',false);
+    % plot histogram
+    subplot(4,2,n)
+    h = histogram(ClassRMS{1},NumBins);
+    xline(mean(ClassRMS{1}),'k')
+    title(ClassMap{n})
+    xlabel('RMS')
+    ylabel('# windows')
+    % subset using rms-distribution
+    binedges = h.BinEdges(2:end);
+    binedges = binedges(logical(h.Values));
+    MinRMS = binedges(MinRMSBin);
+    xline(MinRMS,'r')
+    classminrmsidx = ClassRMS{1} >= MinRMS;
+    SubsetIdx = [SubsetIdx;classidx(classminrmsidx)];
+    disp('')
+end
+
 %% Class (maintain class balance)
 SubsetIdx = SubsetMaintainBalance(IDCol,SubsetVal);
 HData = cellfun(@(x) x(SubsetIdx,:),HData,'UniformOutput',false);
