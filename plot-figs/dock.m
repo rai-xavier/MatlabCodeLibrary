@@ -1,5 +1,5 @@
 function varargout = dock(varargin)
-
+varargout={};
 try
     if nargin>=1
         switch length(varargin)
@@ -25,11 +25,12 @@ try
        f = figure();        
     end
         
-    if not(TerminalMode); set(f,'WindowStyle','docked'); return; end
+    if not(TerminalMode); set(f,'WindowStyle','docked'); end
 
     drawnow
-%     if logical(nargout); 
+    if logical(nargout)
         varargout{1} = f;
+    end
 %         else; varargout{end
 catch ME
 	varargout{1} = [];
