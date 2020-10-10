@@ -4,6 +4,8 @@ switch class(b)
         histdatalabels(b,varargin{:})
     case 'matlab.graphics.chart.primitive.Bar'
         bardatalabels(b,varargin{:})
+    case 'matlab.graphics.scatter';
+        % do something
 end
 return
 end
