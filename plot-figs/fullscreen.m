@@ -1,12 +1,6 @@
 function varargout = fullscreen(varargin)
 varargout={};
 
-% if not(isempty(varargin))
-%     fignum = varargin{1};
-%     f=figure(fignum);
-% else
-%     f = figure();
-% end
 if nargin>=1
     switch length(varargin)
         case 1
