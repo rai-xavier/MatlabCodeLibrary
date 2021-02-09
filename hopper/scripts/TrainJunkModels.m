@@ -9,7 +9,7 @@ BaseModelFileName = fullfile(outdir,'H.mat');
 % BC = cellfun(@(x) ['B' x], C,'UniformOutput',false);
 % FeatureSpaces = [A;BA;C;BC;{'E1C1'};{'E2C1'}]';
 % FeatureSpaces = {'A1','C1','C6','E1C1','E1C6'};
-FeatureSpaces = {'C5','C6','E1C1'};
+FeatureSpaces = {'E1C1'};
 ModelType = {'STA_LIN_OVO'};
 WinSz = 2^15;
 Options = struct('SampleRate',16e3,'NFFT',WinSz);
@@ -40,5 +40,4 @@ end
 %% H2GO
 subDirName = 'h2go-debug';
 pathToHSVM = 'Z:\Hopper_Dev\dev-xavier\Feature-Optimization\H_C5.mat';
-pathtoData = 'Z:\Hopper_Dev\dev-xavier\Feature-Optimization\SegmentData.mat';
 simAndExportOne(subDirName, pathToHSVM, [])
