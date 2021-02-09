@@ -1,5 +1,6 @@
 
 function ResultsTable = getClassifyResultsTable(HopperTable)
+
 ResultsTable = struct;rowidx=1;
 AllFeats = HopperTable.Properties.RowNames;
 AllTypes = HopperTable.Properties.VariableNames;
