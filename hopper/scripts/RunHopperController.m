@@ -2,15 +2,29 @@ ProcessIdentifier = 'DEBUG';
 pathToPoolProfile = '\\abyss1\active_projects\Hopper_Dev\dev-xavier\Hopper\Cloud_Cluster_Profile.settings';
 clc
 %% pathToJsonInit
-baseToolPath = 'Z:\Hopper_Dev\dev-xavier\ToolsDebug\9-22 NoHData';
-pathToJsonInit = fullfile(baseToolPath, 'jsonString_local.json');
+% baseToolPath = 'Z:\Hopper_Dev\dev-xavier\ToolsDebug\11-19 Tools error';
+% baseToolPath = 'Z:\Hopper_Dev\dev-xavier\ToolsDebug\11-23 model_path empty STILL';
+baseToolPath = 'Z:\Hopper_Dev\dev-xavier\ToolsDebug\12-11 CalcFeatOptions';
+pathToJsonCloud = fullfile(baseToolPath, 'jsonString.json');
+pathToJsonLocal = fullfile(baseToolPath, 'jsonString_local.json');
+
+%% re-write to local json
+% json-data
+jsonInitData = ReadJson(pathToJsonCloud);
+jsonInitData = swapDirs(jsonInitData,baseToolPath);
+% write dst
+jsonInitString = jsonencode(jsonInitData);
+fid = fopen(pathToJsonLocal,'w');
+fwrite(fid, jsonInitString,'char');
+fclose(fid);
+
 %% format jsonCommand
 jsonCommand = struct;
 jsonCommand.MethodToUse = 'JSONINIT';
-jsonCommand.MethodParameters = pathToJsonInit;
+jsonCommand.MethodParameters = pathToJsonLocal;
 jsonCommand = jsonencode(jsonCommand);
 %% Run HopperController
-diaryfile = strrep(pathToJsonInit,'.json',['.log']);
+diaryfile = strrep(pathToJsonLocal,'.json',['.log']);
 if exist(diaryfile, 'file') == 2
     diary off
     fclose('all');
