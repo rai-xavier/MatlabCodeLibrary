@@ -1,6 +1,8 @@
 function pktboundscollapsed = CollapsePacketBoundaries3(pkts,minseparation)
 numpkts = size(pkts,1);
+% start w/ 1st pkt
 pktboundscollapsed = pkts(1,:);
+% first (potential) collapse begins w/ 2nd pkt
 pktidx = 2;
 while pktidx <= numpkts
     pktgap = pkts(pktidx,1) - pktboundscollapsed(end,2);
